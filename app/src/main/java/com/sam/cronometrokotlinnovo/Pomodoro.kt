@@ -19,7 +19,7 @@ class Pomodoro : AppCompatActivity() {
 
     private var timeLeft: Long = 0 //tempo inicial em milissegundos
     private val oneSecond = 1000L
-    private var x = 1
+    private var x = 1 //variavel para fazer loop com if
     private var repeticaoCiclo: Int = 4
     private var timeRemaining : Long = 0
     private var timer: CountDownTimer? = null
@@ -104,6 +104,8 @@ class Pomodoro : AppCompatActivity() {
 
         var exibicao = binding.txTempo
 
+        Thread.sleep(400)
+
         timeLeft = 3000
         //timeLeft = (25 *60000) // usar qnd tudo tiver ok
         timer = object : CountDownTimer(timeLeft, oneSecond) {
@@ -130,7 +132,7 @@ class Pomodoro : AppCompatActivity() {
     private fun descanso(){
         DescansoRodou = false
 
-        Thread.sleep(100)
+        Thread.sleep(2000)
         faseIniciar = false
         if (resumeDescansoIsRuning == false){ //não vai tocar o sino quando executar o resumeDescanso
             val player = MediaPlayer.create(applicationContext,R.raw.cartoon_cowbell).start()
@@ -166,7 +168,7 @@ class Pomodoro : AppCompatActivity() {
                 DescansoRodou = true
 
 
-                if (x <= repeticaoCiclo -1){
+                if (x < repeticaoCiclo ){
                     iniciar()
                     x++
                     binding.txtCiclo.setText("Ciclo: $x")
@@ -193,7 +195,7 @@ class Pomodoro : AppCompatActivity() {
                 val format = SimpleDateFormat("mm:ss")
                 val formated = format.format(timeRemaining)
                 exibicao.setText(formated)
-                println("infoaA"+timeRemaining)
+
             }
             override fun onFinish() {
                 descanso()

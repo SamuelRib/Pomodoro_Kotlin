@@ -15,10 +15,10 @@
         android:theme="@style/Theme.CronometroKotlinNovo"
         tools:targetApi="31">
         <activity
-            android:name=".Pomodoro_Personalizado"
-            android:exported="false" />
-        <activity
             android:name=".Pomodoro"
+            android:exported="true" />
+        <activity
+            android:name=".Pomodoro_Personalizado"
             android:exported="true"
             android:launchMode="singleTask">
             <meta-data
@@ -27,7 +27,6 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

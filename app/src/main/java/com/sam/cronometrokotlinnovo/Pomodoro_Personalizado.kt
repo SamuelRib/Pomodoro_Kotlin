@@ -11,9 +11,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import java.text.SimpleDateFormat
 import java.util.*
-// elvis operator?: 0
 //ciclo de estudos
-
+////colocar uns ifs para não executar quando timeleft for == 0
 
 class Pomodoro_Personalizado : AppCompatActivity() {
 
@@ -22,13 +21,12 @@ class Pomodoro_Personalizado : AppCompatActivity() {
     private var timeLeft: Long = 0 //tempo inicial em milissegundos
     private val oneSecond = 1000L
     private var timeRemaining : Long = 0
-    private var x = 1
+    private var x = 1 //variavel para fazer loop com if
     private var repeticaoCiclo: Int = 2
     private var timer: CountDownTimer? = null
     private var isTimerRunning = false //Verifica se está em execução o pomodoro
     private var faseIniciar = false
     private var resumeDescansoIsRuning = false  // Verifica se está executando a fase descanso (há 2 fases, a iniciar e a descanso)
-
 
 
 
@@ -44,7 +42,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
 
         binding.btIniciar.setOnClickListener {
 
-            x = 1 //pd apagar?
+            x = 1
             binding.txtCiclo.setText("Ciclo: $x")
 
             if (isTimerRunning==false){
@@ -84,7 +82,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 resumeDescansoIsRuning = true
                 timer?.cancel()
                 descanso()
-                resumeDescansoIsRuning = false //depois que executar o descanso, ele fica false pra poder executar o som novamente qnd clicar no "reiniciar"
+                resumeDescansoIsRuning = false //depois que executar o descanso, fica false pra poder executar o som novamente qnd clicar no "reiniciar"
             }
         }
 
@@ -94,6 +92,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
 
 
     private fun iniciar() {
+
 
         faseIniciar = true
 
@@ -110,11 +109,12 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         if ( textoEstudo.isNullOrEmpty() || textoEstudo.toLong() !is Number ) {
             timeLeft  = 0
         } else{
-            timeLeft = (textoEstudo.toLong() * 1000) + 10
+            timeLeft = (textoEstudo.toLong() * 1000) + 100
         }
 
 
         var exibicao = binding.txTempo //exibe resultado
+        Thread.sleep(400)
 
         timer = object : CountDownTimer(timeLeft, oneSecond) {
             override fun onTick(millisUntilFinished: Long) {
@@ -124,7 +124,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 val format = SimpleDateFormat("mm:ss")
                 val formated = format.format(timeLeft)
                 timeRemaining = timeLeft
-                exibicao.setText(formated) // Atualizar a interface do usuário aqui, como mostrando o tempo restante
+                exibicao.setText(formated) // Atualizar a interface do usuário aqui, mostrando o tempo restante
 
 
             }
@@ -132,7 +132,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 faseIniciar = false
 
                 exibicao.text = ""
-                descanso() // Executado quando o temporizador chega a zero
+                descanso() // Executado quando o temporizador chegar a zero
             }
         }.start()
         isTimerRunning = true
@@ -152,7 +152,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
 
 
         faseIniciar = false
-        Thread.sleep(200)
+        Thread.sleep(1500)
 
 
         var textoDescanso = binding.editTempoDescanso.text.toString()
@@ -190,22 +190,21 @@ class Pomodoro_Personalizado : AppCompatActivity() {
 
             override fun onFinish() {
 
-                exibicao.text = "Fim" // Executado quando o temporizador chega a zero
+                exibicao.text = "00:00" // Executado quando o temporizador chega a zero
                 txtStatusAtividade.text = ""
                 binding.btIniciar.setText("Iniciar")
                 habilitarBtIniciar()
                 isTimerRunning = false
 
-                if (x <= repeticaoCiclo -1){
+                if (x < repeticaoCiclo ){
                     iniciar()
                     x++
                     binding.txtCiclo.setText("Ciclo: $x")
+                } else{
+                    binding.txtCiclo.visibility = View.INVISIBLE
                 }
-
-
             }
         }
-        Thread.sleep(1400)
         timer?.start()
         isTimerRunning = true
     }
@@ -230,7 +229,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 val format = SimpleDateFormat("mm:ss")
                 val formated = format.format(timeRemaining)
                 exibicao.setText(formated)
-                println("infoaA"+timeRemaining)
+
             }
             override fun onFinish() {
                 descanso()
@@ -241,7 +240,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
 
 
     private fun resumeDescanso(){
-        Thread.sleep(200)
+
         faseIniciar = false
         var exibicao = binding.txTempo
 
@@ -264,10 +263,9 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 resumeDescansoIsRuning = false
 
 
-                if (x <= repeticaoCiclo -1){
+                if (x < repeticaoCiclo ){
                     iniciar()
                     x++
-                    Thread.sleep(1400)
                 }
 
             }
@@ -296,6 +294,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         binding.txtTempoEstudo.visibility = View.INVISIBLE
         binding.txtTempoDescanso.visibility = View.INVISIBLE
         binding.txtRepeticao.visibility = View.INVISIBLE
+
     }
 
     private fun habilitarBtIniciar(){
@@ -310,6 +309,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         binding.txtTempoEstudo.visibility = View.VISIBLE
         binding.txtTempoDescanso.visibility = View.VISIBLE
         binding.txtRepeticao.visibility = View.VISIBLE
+
     }
 
 }

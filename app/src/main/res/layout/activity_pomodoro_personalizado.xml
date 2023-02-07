@@ -27,6 +27,7 @@
         android:id="@+id/txtCiclo"
         android:layout_width="wrap_content"
         android:layout_height="53dp"
+        android:layout_marginTop="15dp"
         android:gravity="center"
         android:text="Ciclo:"
         android:textColor="@color/black"
