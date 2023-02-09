@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.sam.cronometrokotlinnovo.databinding.ActivityPomodoroPersonalizadoBinding
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.CountDownTimer
@@ -45,48 +46,52 @@ class Pomodoro_Personalizado : AppCompatActivity() {
             x = 1
             binding.txtCiclo.setText("Ciclo: $x")
 
+
             if (isTimerRunning==false){
-                binding.btIniciar.setText("Parar")
                 iniciar()
+                binding.btIniciar.setText("Parar")
+                binding.btPausar.setText("Pausar")
+                binding.btPausar.isEnabled = true //desativa o botão pausar
+
             } else{
-                binding.btIniciar.setText("Iniciar")
                 timer?.cancel()
                 isTimerRunning = false
+                binding.btIniciar.setText("Reiniciar")
+                binding.btPausar.isEnabled = false //ativa o botão pausar
+                binding.btPausar.setTextColor(Color.WHITE)
             }
         }
 
         binding.btPausar.setOnClickListener {
 
             if (isTimerRunning == true){
-                binding.btPausar.setText("Retomar")
                 pauseTimer()
+                binding.btPausar.setText("Retomar")
+                binding.btIniciar.isEnabled = false //ativa o botão pausar
+                binding.btIniciar.setTextColor(Color.GRAY)
+
 
             } else{
                 if (faseIniciar==true){
-                    binding.btPausar.setText("Pausar")
                     resumeIniciar()
+                    binding.btPausar.setText("Pausar")
+                    binding.btIniciar.isEnabled = true //ativa o botão pausar
+                    binding.btIniciar.setTextColor(Color.WHITE)
                 }
                 else{
-                    binding.btPausar.setText("Pausar")
                     resumeDescanso()
+                    binding.btPausar.setText("Pausar")
+                    binding.btIniciar.isEnabled = true //ativa o botão pausar
+                    binding.btIniciar.setTextColor(Color.WHITE)
                 }
             }
         }
 
-        binding.btResetar.setOnClickListener {
-            if (faseIniciar==true){
-                timer?.cancel()
-                iniciar()
-            }
-            else{
-                resumeDescansoIsRuning = true
-                timer?.cancel()
-                descanso()
-                resumeDescansoIsRuning = false //depois que executar o descanso, fica false pra poder executar o som novamente qnd clicar no "reiniciar"
-            }
+        binding.btPersonalizado.setOnClickListener {
+            timer?.cancel()
+            val intent = Intent(this, Pomodoro::class.java)
+            startActivity(intent)
         }
-
-        //val a =R.drawable.arrow_back_ios apagar ou configurar imagem back
 
     }
 
@@ -143,7 +148,6 @@ class Pomodoro_Personalizado : AppCompatActivity() {
 
 
         desabilitarBtIniciar()
-
 
         //Mostra o status descanse
         val txtStatusAtividade = binding.txtStatusAtividade
@@ -202,6 +206,10 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                     binding.txtCiclo.setText("Ciclo: $x")
                 } else{
                     binding.txtCiclo.visibility = View.INVISIBLE
+                }
+
+                if (isTimerRunning == false) {
+                    binding.btIniciar.setText("Reiniciar")
                 }
             }
         }
@@ -267,6 +275,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                     iniciar()
                     x++
                 }
+
 
             }
         }.start()

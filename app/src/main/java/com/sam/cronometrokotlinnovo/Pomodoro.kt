@@ -12,6 +12,8 @@ import com.sam.cronometrokotlinnovo.databinding.ActivityPomodoroBinding
 import java.text.SimpleDateFormat
 //"Quem controla seu tempo, domina o futuro.
 //fazer testes com tempo maior
+//considerar tirar botão reset
+
 class Pomodoro : AppCompatActivity() {
 
     private lateinit var binding: ActivityPomodoroBinding
@@ -25,9 +27,7 @@ class Pomodoro : AppCompatActivity() {
     private var timer: CountDownTimer? = null
     private var isTimerRunning = false //Verifica se está em execução o pomodoro
     private var faseIniciar = false
-    private var DescansoRodou = false // ver se precisa apagar!!
     private var resumeDescansoIsRuning = false  // Verifica se está executando a fase descanso (há 2 fases, a iniciar e a descanso)
-
 
 
 
@@ -41,15 +41,22 @@ class Pomodoro : AppCompatActivity() {
         supportActionBar?.hide()
 
         binding.btIniciar.setOnClickListener {
+
             x = 1
             binding.txtCiclo.setText("Ciclo: $x")
+
             if (isTimerRunning==false){
-                binding.btIniciar.setText("Parar")
                 iniciar()
+                binding.btIniciar.setText("Parar")
+                binding.btPausar.setText("Pausar")
+                binding.btPausar.isEnabled = true //desativa o botão pausar
+
             } else{
-                binding.btIniciar.setText("Iniciar")
                 timer?.cancel()
                 isTimerRunning = false
+                binding.btIniciar.setText("Reiniciar")
+                binding.btPausar.isEnabled = false //ativa o botão pausar
+                binding.btPausar.setTextColor(Color.WHITE)
             }
         }
 
@@ -57,33 +64,29 @@ class Pomodoro : AppCompatActivity() {
         binding.btPausar.setOnClickListener {
 
             if (isTimerRunning == true){
-                binding.btPausar.setText("Retomar")
                 pauseTimer()
+                binding.btPausar.setText("Retomar")
+                binding.btIniciar.isEnabled = false //ativa o botão pausar
+                binding.btIniciar.setTextColor(Color.GRAY)
+
 
             } else{
                 if (faseIniciar==true){
-                    binding.btPausar.setText("Pausar")
                     resumeIniciar()
+                    binding.btPausar.setText("Pausar")
+                    binding.btIniciar.isEnabled = true //ativa o botão pausar
+                    binding.btIniciar.setTextColor(Color.WHITE)
                 }
                 else{
-                    binding.btPausar.setText("Pausar")
                     resumeDescanso()
+                    binding.btPausar.setText("Pausar")
+                    binding.btIniciar.isEnabled = true //ativa o botão pausar
+                    binding.btIniciar.setTextColor(Color.WHITE)
                 }
             }
         }
 
-        binding.btResetar.setOnClickListener {
-            if (faseIniciar==true){
-                timer?.cancel()
-                iniciar()
-            }
-            else{
-                resumeDescansoIsRuning = true
-                timer?.cancel()
-                descanso()
-                resumeDescansoIsRuning = false //depois que executar o descanso, ele fica false pra poder executar o som novamente qnd clicar no "reiniciar"
-            }
-        }
+
 
         binding.btPersonalizado.setOnClickListener {
             timer?.cancel()
@@ -104,10 +107,10 @@ class Pomodoro : AppCompatActivity() {
 
         var exibicao = binding.txTempo
 
-        Thread.sleep(400)
+        Thread.sleep(600)
 
-        timeLeft = 3000
-        //timeLeft = (25 *60000) // usar qnd tudo tiver ok
+        //timeLeft = 2000+100
+        timeLeft = (25 *60000) // usar qnd tudo tiver ok
         timer = object : CountDownTimer(timeLeft, oneSecond) {
             override fun onTick(millisUntilFinished: Long) {
                 faseIniciar = true
@@ -117,7 +120,7 @@ class Pomodoro : AppCompatActivity() {
                 val formated = format.format(timeLeft)
                 timeRemaining = timeLeft
                 exibicao.setText(formated) // Atualizar a interface do usuário aqui, como mostrando o tempo restante
-                println("infoa"+timeRemaining) //apagar depois
+
 
             }
             override fun onFinish() {
@@ -130,22 +133,22 @@ class Pomodoro : AppCompatActivity() {
 
 
     private fun descanso(){
-        DescansoRodou = false
 
-        Thread.sleep(2000)
+        desabilitarBtIniciar()
+
+        Thread.sleep(1000)
         faseIniciar = false
         if (resumeDescansoIsRuning == false){ //não vai tocar o sino quando executar o resumeDescanso
             val player = MediaPlayer.create(applicationContext,R.raw.cartoon_cowbell).start()
         }
 
-        desabilitarBtIniciar()
 
+        //descanso longo
         if (x==4){
-            timeLeft = 5000 +10
+            timeLeft = (25 *60000) +100 // se for o ciclo 4, fara um descanso de 25 min
         } else{
-            timeLeft = (2000) +10
+            timeLeft = (5 *60000) +100 // se for o ciclo < 4, fara um descanso de 5 min
         }
-
 
 
         var exibicao = binding.txTempo
@@ -164,8 +167,7 @@ class Pomodoro : AppCompatActivity() {
 
                 exibicao.text = "Fim" // Executado quando o temporizador chega a zero
                 habilitarBtIniciar()
-                binding.btIniciar.setText("Reiniciar")
-                DescansoRodou = true
+                isTimerRunning = false
 
 
                 if (x < repeticaoCiclo ){
@@ -173,6 +175,12 @@ class Pomodoro : AppCompatActivity() {
                     x++
                     binding.txtCiclo.setText("Ciclo: $x")
                 }
+
+                if (isTimerRunning == false) {
+                    binding.btIniciar.setText("Reiniciar")
+                }
+
+
             }
         }.start()
         isTimerRunning = true
@@ -219,8 +227,18 @@ class Pomodoro : AppCompatActivity() {
             override fun onFinish() {
                 exibicao.text = "Fim" // Executado quando o temporizador chega a zero
                 habilitarBtIniciar()
-                binding.btIniciar.setText("Reiniciar")
                 resumeDescansoIsRuning = false
+
+                if (x < repeticaoCiclo ){
+                    iniciar()
+                    x++
+                    binding.txtCiclo.setText("Ciclo: $x")
+                }
+
+                if (isTimerRunning == false) {
+                    binding.btIniciar.setText("Reiniciar")
+                }
+
             }
         }.start()
         isTimerRunning = true
@@ -230,16 +248,14 @@ class Pomodoro : AppCompatActivity() {
 
 
     private fun desabilitarBtIniciar(){
-        binding.btIniciar.isEnabled = false //desativa o botão iniciar
-        binding.btIniciar.setTextColor(Color.GRAY)
+
         val txtStatusAtividade = binding.txtStatusAtividade
         txtStatusAtividade.setText("Descanse")
         txtStatusAtividade.setTextColor(Color.BLUE)
     }
 
     private fun habilitarBtIniciar(){
-        binding.btIniciar.isEnabled = true //ativa o botão iniciar no final da execução
-        binding.btIniciar.setTextColor(Color.WHITE)
+
         val txtStatusAtividade = binding.txtStatusAtividade
         txtStatusAtividade.text = ""
     }
