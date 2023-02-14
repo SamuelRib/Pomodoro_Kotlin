@@ -1,0 +1,1 @@
+Projeto aqui feito na linguagem kotlin é um modelo de estudo conhecido como Pomodor, usado no auxílio de controle de foco e tempo para um melhor aproveitamento de atividades de desenvolvimento pessoal.
