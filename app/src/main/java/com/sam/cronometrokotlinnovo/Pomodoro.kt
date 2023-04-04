@@ -1,18 +1,15 @@
 package com.sam.cronometrokotlinnovo
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.view.inputmethod.InputMethodManager
-import androidx.core.view.isInvisible
 import com.sam.cronometrokotlinnovo.databinding.ActivityPomodoroBinding
 import java.text.SimpleDateFormat
-//"Quem controla seu tempo, domina o futuro.
-//fazer testes com tempo maior
-//considerar tirar botão reset
+//"Quem controla seu tempo, domina seu futuro.
+
+
 
 class Pomodoro : AppCompatActivity() {
 

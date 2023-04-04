@@ -11,9 +11,8 @@ import android.os.CountDownTimer
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import java.text.SimpleDateFormat
-import java.util.*
-//ciclo de estudos
-////colocar uns ifs para não executar quando timeleft for == 0
+
+
 
 class Pomodoro_Personalizado : AppCompatActivity() {
 
