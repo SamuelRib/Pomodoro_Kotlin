@@ -8,6 +8,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.CountDownTimer
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import java.text.SimpleDateFormat
@@ -35,8 +37,6 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityPomodoroPersonalizadoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-
         supportActionBar?.hide()
 
 
@@ -55,9 +55,11 @@ class Pomodoro_Personalizado : AppCompatActivity() {
             } else{
                 timer?.cancel()
                 isTimerRunning = false
-                binding.btIniciar.setText("Reiniciar")
+                habilitarBtIniciar()
+                var exibicao = binding.txTempo.setText("00:00") // Executado quando o temporizador chega a zero
+                binding.txtStatusAtividade.text = ""
                 binding.btPausar.isEnabled = false //ativa o botão pausar
-                binding.btPausar.setTextColor(Color.WHITE)
+
             }
         }
 
@@ -86,24 +88,19 @@ class Pomodoro_Personalizado : AppCompatActivity() {
             }
         }
 
-        binding.btPersonalizado.setOnClickListener {
+        binding.btClassico.setOnClickListener {
             timer?.cancel()
             val intent = Intent(this, Pomodoro::class.java)
             startActivity(intent)
         }
-
     }
 
 
     private fun iniciar() {
 
-
         faseIniciar = true
-
         ocultarTecladoCelular()
         desabilitarBtIniciar()
-
-
         val txtStatusAtividade = binding.txtStatusAtividade
         txtStatusAtividade.setText("Concentre")
         txtStatusAtividade.setTextColor(Color.RED)
@@ -113,7 +110,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         if ( textoEstudo.isNullOrEmpty() || textoEstudo.toLong() !is Number ) {
             timeLeft  = 0
         } else{
-            timeLeft = (textoEstudo.toLong() * 1000) + 100
+            timeLeft = (textoEstudo.toLong() * 1000*60) + 100 //define o tempo do pomodoro
         }
 
 
@@ -129,22 +126,21 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 val formated = format.format(timeLeft)
                 timeRemaining = timeLeft
                 exibicao.setText(formated) // Atualizar a interface do usuário aqui, mostrando o tempo restante
-
-
+                isTimerRunning = true
             }
             override fun onFinish() {
                 faseIniciar = false
-
+                isTimerRunning = false
+                vibrarCelular()
                 exibicao.text = ""
                 descanso() // Executado quando o temporizador chegar a zero
+
             }
         }.start()
-        isTimerRunning = true
     }
 
 
     private fun descanso(){
-
 
         desabilitarBtIniciar()
 
@@ -152,7 +148,6 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         val txtStatusAtividade = binding.txtStatusAtividade
         txtStatusAtividade.setText("Descanse")
         txtStatusAtividade.setTextColor(Color.BLUE)
-
 
         faseIniciar = false
         Thread.sleep(1500)
@@ -162,7 +157,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         if ( textoDescanso.isNullOrEmpty() || textoDescanso.toLong() !is Number ) {
             timeLeft  = 0
         } else{
-            timeLeft = (textoDescanso.toLong() * 1000) +100
+            timeLeft = (textoDescanso.toLong() * 1000*60) +100 //define o tempo do pomodoro
         }
 
         var textoRepeticao = binding.editRepeticao.text.toString()
@@ -173,14 +168,12 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         }
 
 
-
         if (resumeDescansoIsRuning == false){ //não vai tocar o sino quando executar o resumeDescanso
             val player = MediaPlayer.create(applicationContext,R.raw.cartoon_cowbell).start()
         }
 
 
         var exibicao = binding.txTempo //exibe resultado
-
         timer = object : CountDownTimer(timeLeft, oneSecond) {
             override fun onTick(millisUntilFinished: Long) {
                 timeLeft = millisUntilFinished
@@ -189,15 +182,17 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 val formated = format.format(timeLeft)
                 exibicao.setText(formated) // Atualizar a interface do usuário aqui, como mostrando o tempo restante
                 timeRemaining = timeLeft
+                isTimerRunning = true
             }
 
             override fun onFinish() {
 
                 exibicao.text = "00:00" // Executado quando o temporizador chega a zero
                 txtStatusAtividade.text = ""
-                binding.btIniciar.setText("Iniciar")
                 habilitarBtIniciar()
+                vibrarCelular()
                 isTimerRunning = false
+
 
                 if (x < repeticaoCiclo ){
                     iniciar()
@@ -208,12 +203,11 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 }
 
                 if (isTimerRunning == false) {
-                    binding.btIniciar.setText("Reiniciar")
+                    binding.btIniciar.setText("Iniciar")
                 }
             }
         }
         timer?.start()
-        isTimerRunning = true
     }
 
     private fun pauseTimer(){
@@ -236,13 +230,15 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 val format = SimpleDateFormat("mm:ss")
                 val formated = format.format(timeRemaining)
                 exibicao.setText(formated)
+                isTimerRunning = true
 
             }
             override fun onFinish() {
+                vibrarCelular()
                 descanso()
             }
         }.start()
-        isTimerRunning = true
+
     }
 
 
@@ -261,24 +257,24 @@ class Pomodoro_Personalizado : AppCompatActivity() {
                 val format = SimpleDateFormat("mm:ss")
                 val formated = format.format(timeRemaining)
                 exibicao.setText(formated)
+                isTimerRunning = true
             }
             override fun onFinish() {
 
                 exibicao.text = "Fim" // Executado quando o temporizador chega a zero
                 binding.btIniciar.setText("Iniciar")
                 habilitarBtIniciar()
+                vibrarCelular()
                 resumeDescansoIsRuning = false
+                isTimerRunning==false
 
 
                 if (x < repeticaoCiclo ){
                     iniciar()
                     x++
                 }
-
-
             }
         }.start()
-        isTimerRunning = true
     }
 
 
@@ -291,7 +287,7 @@ class Pomodoro_Personalizado : AppCompatActivity() {
 
     private fun desabilitarBtIniciar(){
         //binding.btIniciar.isEnabled = false //desativa o botão iniciar
-        //binding.btIniciar.setTextColor(Color.GRAY)
+
         val txtStatusAtividade = binding.txtStatusAtividade
         txtStatusAtividade.setText("Descanse")
         txtStatusAtividade.setTextColor(Color.BLUE)
@@ -310,6 +306,8 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         binding.btIniciar.setTextColor(Color.WHITE)
         val txtStatusAtividade = binding.txtStatusAtividade
         txtStatusAtividade.text = ""
+        binding.btIniciar.setText("Iniciar")
+        binding.btPausar.setTextColor(Color.WHITE)
 
         binding.editTempoEstudo.visibility = View.VISIBLE
         binding.editTempoDescanso.visibility = View.VISIBLE
@@ -318,6 +316,11 @@ class Pomodoro_Personalizado : AppCompatActivity() {
         binding.txtTempoDescanso.visibility = View.VISIBLE
         binding.txtRepeticao.visibility = View.VISIBLE
 
+    }
+
+    fun vibrarCelular(){
+        val vibratorService = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vibratorService.vibrate(VibrationEffect.createOneShot(600, VibrationEffect.DEFAULT_AMPLITUDE))
     }
 
 }

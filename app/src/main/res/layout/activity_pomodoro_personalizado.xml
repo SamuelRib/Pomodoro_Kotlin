@@ -188,7 +188,7 @@
         app:layout_constraintTop_toBottomOf="@+id/bt_iniciar" />        "
 
     <Button
-        android:id="@+id/bt_personalizado"
+        android:id="@+id/bt_classico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"

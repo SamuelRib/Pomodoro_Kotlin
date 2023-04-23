@@ -3,14 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/pomodoro_icone"
+        android:icon="@mipmap/pomodoro_icone"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/pomodoro_icone"
+        android:roundIcon="@mipmap/pomodoro_icone"
         android:supportsRtl="true"
         android:theme="@style/Theme.CronometroKotlinNovo"
         tools:targetApi="31">

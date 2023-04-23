@@ -1,10 +1,13 @@
 package com.sam.cronometrokotlinnovo
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.VibrationEffect
+import android.os.Vibrator
 import com.sam.cronometrokotlinnovo.databinding.ActivityPomodoroBinding
 import java.text.SimpleDateFormat
 //"Quem controla seu tempo, domina seu futuro.
@@ -122,6 +125,7 @@ class Pomodoro : AppCompatActivity() {
             }
             override fun onFinish() {
                 faseIniciar = false
+                vibrarCelular()
                 descanso()
             }
         }.start()
@@ -164,6 +168,7 @@ class Pomodoro : AppCompatActivity() {
 
                 exibicao.text = "Fim" // Executado quando o temporizador chega a zero
                 habilitarBtIniciar()
+                vibrarCelular()
                 isTimerRunning = false
 
 
@@ -181,7 +186,6 @@ class Pomodoro : AppCompatActivity() {
             }
         }.start()
         isTimerRunning = true
-
     }
 
     private fun pauseTimer(){
@@ -203,6 +207,7 @@ class Pomodoro : AppCompatActivity() {
 
             }
             override fun onFinish() {
+                vibrarCelular()
                 descanso()
             }
         }.start()
@@ -224,6 +229,7 @@ class Pomodoro : AppCompatActivity() {
             override fun onFinish() {
                 exibicao.text = "Fim" // Executado quando o temporizador chega a zero
                 habilitarBtIniciar()
+                vibrarCelular()
                 resumeDescansoIsRuning = false
 
                 if (x < repeticaoCiclo ){
@@ -256,4 +262,11 @@ class Pomodoro : AppCompatActivity() {
         val txtStatusAtividade = binding.txtStatusAtividade
         txtStatusAtividade.text = ""
     }
+
+    public fun vibrarCelular(){
+    val vibratorService = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    vibratorService.vibrate(VibrationEffect.createOneShot(600, VibrationEffect.DEFAULT_AMPLITUDE))
+    }
+
+
 }
